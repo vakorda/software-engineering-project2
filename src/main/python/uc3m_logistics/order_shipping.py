@@ -1,6 +1,7 @@
 """Contains the class OrderShipping"""
 from datetime import datetime
 import hashlib
+import json
 
 class OrderShipping():
     """Class representing the information required for shipping of an order"""
@@ -19,14 +20,20 @@ class OrderShipping():
             delivery_days = 1
 
         #timestamp is represneted in seconds.microseconds
-        #__delivery_day must be expressed in senconds to be added to the timestap
+        #__delivery_day must be expressed in seconds to be added to the timestap
         self.__delivery_day = self.__issued_at + (delivery_days * 24 * 60 * 60)
 
-    def __signature_string(self):
+    def to_json(self):
+        return self.__signature_string()
+
+    def __signature_string(self):  # TODO
         """Composes the string to be used for generating the key for the date"""
-        return "{alg:" + self.__alg +",typ:" + self.__type +",order_id:" + \
-               self.__order_id + ",issuedate:" + self.__issued_at + \
-               ",deliveryday:" + self.__delivery_day + "}"
+        return json.dumps({"alg":self.__alg,
+                           "typ":self.__type,
+                           "order_id":self.__order_id,
+                           "issued_at":self.__issued_at,
+                           "delivery_day":self.__delivery_day
+                           }, separators=(',', ':'))
 
     @property
     def product_id( self ):
@@ -41,6 +48,7 @@ class OrderShipping():
     def order_id( self ):
         """Property that represents the order_id"""
         return self.__order_id
+
     @order_id.setter
     def order_id( self, value ):
         self.__order_id = value
@@ -72,3 +80,7 @@ class OrderShipping():
     def delivery_day( self ):
         """Returns the delivery day for the order"""
         return self.__delivery_day
+
+os = OrderShipping("11111", "11111", "111111", "Regular")
+
+print(os.tracking_code)
