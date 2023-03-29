@@ -1,13 +1,14 @@
 """class for testing the regsiter_order method"""
 import os
 import json
+from unittest import TestCase
 import unittest
 from uc3m_logistics import OrderManager
 from freezegun import freeze_time
 from uc3m_logistics import OrderRequest
 from uc3m_logistics import OrderManagementException
 
-class MyTestCase(unittest.TestCase):
+class MyTestCase(TestCase):
     """class for testing the register_order method"""
 
     __file_path: str
@@ -226,8 +227,9 @@ class MyTestCase(unittest.TestCase):
         zip_code = "28005"
 
         # run the function
-        with self.assertRaises(OrderManagementException):
+        with self.assertRaises(OrderManagementException) as ome:
             self.__order_manager.register_order(product_id, order_type, delivery_address, phone_number, zip_code)
+        self.assertEqual("Product id wrong format", str(ome.exception))
 
     @freeze_time("17-03-2023")
     def test_03(self):
@@ -239,8 +241,9 @@ class MyTestCase(unittest.TestCase):
         zip_code = "28005"
 
         # run the function
-        with self.assertRaises(OrderManagementException):
+        with self.assertRaises(OrderManagementException) as ome:
             self.__order_manager.register_order(product_id, order_type, delivery_address, phone_number, zip_code)
+        self.assertEqual("Product id not valid", str(ome.exception))
 
     @freeze_time("17-03-2023")
     def test_04(self):
@@ -252,229 +255,247 @@ class MyTestCase(unittest.TestCase):
         zip_code = "28005"
 
         # run the function
-        with self.assertRaises(OrderManagementException):
+        with self.assertRaises(OrderManagementException) as ome:
             self.__order_manager.register_order(product_id, order_type, delivery_address, phone_number, zip_code)
+        self.assertEqual("Product id not valid", str(ome.exception))
 
     @freeze_time("17-03-2023")
     def test_05(self):
         """NV-5-BV) (NOT VALID | product_id[longer] length=14"""
-        product_id = "884216914232200"
+        product_id = "84216914232200"
         order_type = "PREMIUM"
         delivery_address = "C/LISBOA,4, MADRID, SPAIN"
         phone_number = "123456789"
         zip_code = "28005"
 
         # run the function
-        with self.assertRaises(OrderManagementException):
+        with self.assertRaises(OrderManagementException) as ome:
             self.__order_manager.register_order(product_id, order_type, delivery_address, phone_number, zip_code)
+        self.assertEqual("Product id not valid", str(ome.exception))
 
     @freeze_time("17-03-2023")
     def test_07(self):
         """NV-7-EC) (NOT VALID | order_type=PRE"""
-        product_id = "884216914232200"
+        product_id = "8421691423220"
         order_type = "PRE"
         delivery_address = "C/LISBOA,4, MADRID, SPAIN"
         phone_number = "123456789"
         zip_code = "28005"
 
         # run the function
-        with self.assertRaises(OrderManagementException):
+        with self.assertRaises(OrderManagementException) as ome:
             self.__order_manager.register_order(product_id, order_type, delivery_address, phone_number, zip_code)
+        self.assertEqual("Order type not valid", str(ome.exception))
 
     @freeze_time("17-03-2023")
     def test_09(self):
         """NV-9-EC) (NOT VALID | order_type not string"""
-        product_id = "884216914232200"
+        product_id = "8421691423220"
         order_type = "22608455739725133"
         delivery_address = "C/LISBOA,4, MADRID, SPAIN"
         phone_number = "123456789"
         zip_code = "28005"
 
         # run the function
-        with self.assertRaises(OrderManagementException):
+        with self.assertRaises(OrderManagementException) as ome:
             self.__order_manager.register_order(product_id, order_type, delivery_address, phone_number, zip_code)
+        self.assertEqual("Order type wrong format", str(ome.exception))
 
     @freeze_time("17-03-2023")
     def test_10(self):
         """NV-10-EC)  (NOT VALID | address 0 spaces"""
-        product_id = "884216914232200"
+        product_id = "8421691423220"
         order_type = "PREMIUM"
         delivery_address = "C/LISBOA,4,MADRID,SPAIN"
         phone_number = "123456789"
         zip_code = "28005"
 
         # run the function
-        with self.assertRaises(OrderManagementException):
+        with self.assertRaises(OrderManagementException) as ome:
             self.__order_manager.register_order(product_id, order_type, delivery_address, phone_number, zip_code)
+        self.assertEqual("Address not valid", str(ome.exception))
 
     @freeze_time("17-03-2023")
     def test_11(self):
         """NV-11-BV)  (NOT VALID | address[shorter] length=19"""
-        product_id = "884216914232200"
+        product_id = "8421691423220"
         order_type = "PREMIUM"
         delivery_address = "C/FA, MADRID, SPAIN"
         phone_number = "123456789"
         zip_code = "28005"
 
         # run the function
-        with self.assertRaises(OrderManagementException):
+        with self.assertRaises(OrderManagementException) as ome:
             self.__order_manager.register_order(product_id, order_type, delivery_address, phone_number, zip_code)
+        self.assertEqual("Address not valid", str(ome.exception))
 
     @freeze_time("17-03-2023")
     def test_14(self):
         """NV-14-BV)  (NOT VALID | address[longer] length=101"""
-        product_id = "884216914232200"
+        product_id = "8421691423220"
         order_type = "PREMIUM"
         delivery_address = "CJ/ LA SARGENTO PEPA, 24680, GARGANTILLA DEL LOZOYA Y PINILLA DE BUITRAGO, COMUNIDAD DE MADRID, SPAIN"
         phone_number = "123456789"
         zip_code = "28005"
 
         # run the function
-        with self.assertRaises(OrderManagementException):
+        with self.assertRaises(OrderManagementException) as ome:
             self.__order_manager.register_order(product_id, order_type, delivery_address, phone_number, zip_code)
+        self.assertEqual("Address not valid", str(ome.exception))
 
     @freeze_time("17-03-2023")
     def test_15(self):
         """NV-15-EC) (NOT VALID | address has 1 space and 1 word"""
-        product_id = "884216914232200"
+        product_id = "8421691423220"
         order_type = "PREMIUM"
         delivery_address = "C/LISBOA,4,MADRID,SPAIN "
         phone_number = "123456789"
         zip_code = "28005"
 
         # run the function
-        with self.assertRaises(OrderManagementException):
+        with self.assertRaises(OrderManagementException) as ome:
             self.__order_manager.register_order(product_id, order_type, delivery_address, phone_number, zip_code)
+        self.assertEqual("Address not valid", str(ome.exception))
 
     @freeze_time("17-03-2023")
     def test_16(self):
         """NV-16-BV) (NOT VALID | phone_number[longer] length=10"""
-        product_id = "884216914232200"
+        product_id = "8421691423220"
         order_type = "PREMIUM"
         delivery_address = "C/LISBOA,4, MADRID, SPAIN"
         phone_number = "1234567898"
         zip_code = "28005"
 
         # run the function
-        with self.assertRaises(OrderManagementException):
+        with self.assertRaises(OrderManagementException) as ome:
             self.__order_manager.register_order(product_id, order_type, delivery_address, phone_number, zip_code)
+        self.assertEqual("Phone number not valid", str(ome.exception))
 
     @freeze_time("17-03-2023")
     def test_17(self):
         """NV-17-BV) (NOT VALID | phone_number[shorter] length=9"""
-        product_id = "884216914232200"
+        product_id = "8421691423220"
         order_type = "PREMIUM"
         delivery_address = "C/LISBOA,4, MADRID, SPAIN"
-        phone_number = "112345678"
+        phone_number = "12345678"
         zip_code = "28005"
 
         # run the function
-        with self.assertRaises(OrderManagementException):
+        with self.assertRaises(OrderManagementException) as ome:
             self.__order_manager.register_order(product_id, order_type, delivery_address, phone_number, zip_code)
+        self.assertEqual("Phone number not valid", str(ome.exception))
 
     @freeze_time("17-03-2023")
     def test_18(self):
         """NV-18-EC) (NOT VALID | phone_number not number"""
-        product_id = "884216914232200"
+        product_id = "8421691423220"
         order_type = "PREMIUM"
         delivery_address = "C/LISBOA,4, MADRID, SPAIN"
         phone_number = "123456A89"
         zip_code = "28005"
 
         # run the function
-        with self.assertRaises(OrderManagementException):
+        with self.assertRaises(OrderManagementException) as ome:
             self.__order_manager.register_order(product_id, order_type, delivery_address, phone_number, zip_code)
+        self.assertEqual("Phone number wrong format", str(ome.exception))
 
     @freeze_time("17-03-2023")
     def test_19(self):
         """NV-19-EC) (NOT VALID | phone_number is string"""
-        product_id = "884216914232200"
+        product_id = "8421691423220"
         order_type = "PREMIUM"
         delivery_address = "C/LISBOA,4, MADRID, SPAIN"
         phone_number = "JUANSELMO"
         zip_code = "28005"
 
         # run the function
-        with self.assertRaises(OrderManagementException):
+        with self.assertRaises(OrderManagementException) as ome:
             self.__order_manager.register_order(product_id, order_type, delivery_address, phone_number, zip_code)
+        self.assertEqual("Phone number wrong format", str(ome.exception))
 
     @freeze_time("17-03-2023")
     def test_20(self):
         """NV-20-BV) (NOT VALID | zip_code[longer] length=6"""
-        product_id = "884216914232200"
+        product_id = "8421691423220"
         order_type = "PREMIUM"
         delivery_address = "C/LISBOA,4, MADRID, SPAIN"
         phone_number = "123456789"
         zip_code = "034222"
 
         # run the function
-        with self.assertRaises(OrderManagementException):
+        with self.assertRaises(OrderManagementException) as ome:
             self.__order_manager.register_order(product_id, order_type, delivery_address, phone_number, zip_code)
+        self.assertEqual("Zip code not valid", str(ome.exception))
 
     @freeze_time("17-03-2023")
     def test_21(self):
         """NV-21-BV) (NOT VALID | zip_code[shorter] length=4"""
-        product_id = "884216914232200"
+        product_id = "8421691423220"
         order_type = "PREMIUM"
         delivery_address = "C/LISBOA,4, MADRID, SPAIN"
         phone_number = "123456789"
         zip_code = "2500"
 
         # run the function
-        with self.assertRaises(OrderManagementException):
+        with self.assertRaises(OrderManagementException) as ome:
             self.__order_manager.register_order(product_id, order_type, delivery_address, phone_number, zip_code)
+        self.assertEqual("Zip code not valid", str(ome.exception))
 
     @freeze_time("17-03-2023")
     def test_22(self):
         """NV-22-EC) (NOT VALID | zip_code not number"""
-        product_id = "884216914232200"
+        product_id = "8421691423220"
         order_type = "PREMIUM"
         delivery_address = "C/LISBOA,4, MADRID, SPAIN"
         phone_number = "123456789"
         zip_code = "123A4"
 
         # run the function
-        with self.assertRaises(OrderManagementException):
+        with self.assertRaises(OrderManagementException) as ome:
             self.__order_manager.register_order(product_id, order_type, delivery_address, phone_number, zip_code)
+        self.assertEqual("Zip code wrong format", str(ome.exception))
 
     @freeze_time("17-03-2023")
     def test_23(self):
         """NV-23-BV) (NOT VALID | zip_code[upper_bound]=53000"""
-        product_id = "884216914232200"
+        product_id = "8421691423220"
         order_type = "PREMIUM"
         delivery_address = "C/LISBOA,4, MADRID, SPAIN"
         phone_number = "123456789"
         zip_code = "53000"
 
         # run the function
-        with self.assertRaises(OrderManagementException):
+        with self.assertRaises(OrderManagementException) as ome:
             self.__order_manager.register_order(product_id, order_type, delivery_address, phone_number, zip_code)
+        self.assertEqual("Zip code not valid", str(ome.exception))
 
     @freeze_time("17-03-2023")
     def test_26(self):
-        """NV-26-BV) (NOT VALID | zip_code[upper_bound]=00999"""
-        product_id = "884216914232200"
+        """NV-26-BV) (NOT VALID | zip_code[lower_bound]=00999"""
+        product_id = "8421691423220"
         order_type = "PREMIUM"
         delivery_address = "C/LISBOA,4, MADRID, SPAIN"
         phone_number = "123456789"
         zip_code = "00999"
 
         # run the function
-        with self.assertRaises(OrderManagementException):
+        with self.assertRaises(OrderManagementException) as ome:
             self.__order_manager.register_order(product_id, order_type, delivery_address, phone_number, zip_code)
+        self.assertEqual("Zip code not valid", str(ome.exception))
 
     @freeze_time("17-03-2023")
-    def test_26(self):
+    def test_27(self):
         """NV-27-EC) (NOT VALID | zip_code not number"""
-        product_id = "884216914232200"
+        product_id = "8421691423220"
         order_type = "PREMIUM"
         delivery_address = "C/LISBOA,4, MADRID, SPAIN"
         phone_number = "123456789"
         zip_code = "03A66"
 
         # run the function
-        with self.assertRaises(OrderManagementException):
+        with self.assertRaises(OrderManagementException) as ome:
             self.__order_manager.register_order(product_id, order_type, delivery_address, phone_number, zip_code)
+        self.assertEqual("Zip code wrong format", str(ome.exception))
 
 
 if __name__ == '__main__':

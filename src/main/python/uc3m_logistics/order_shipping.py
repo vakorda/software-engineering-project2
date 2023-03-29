@@ -80,7 +80,3 @@ class OrderShipping():
     def delivery_day( self ):
         """Returns the delivery day for the order"""
         return self.__delivery_day
-
-os = OrderShipping("11111", "11111", "111111", "Regular")
-
-print(os.tracking_code)

@@ -1,6 +1,8 @@
 """Module """
 import json
 import os
+import re
+
 from .order_request import OrderRequest
 from .order_management_exception import OrderManagementException
 from .order_shipping import OrderShipping
@@ -45,8 +47,8 @@ class OrderManager:
             mult = 1 if mult == 3 else 3
         return count % 10 == check
 
-    @staticmethod
-    def register_order(product_id:str, order_type: str, address: str, phone_number: str, zip_code: str) -> str:
+
+    def register_order(self, product_id:str, order_type: str, address: str, phone_number: str, zip_code: str) -> str:
         # Check all attributes have the correct datatype
         if not isinstance(product_id, str) or not isinstance(order_type, str) or not isinstance(address, str) or \
                 not isinstance(phone_number, str) or not isinstance(zip_code, str):
@@ -108,27 +110,38 @@ class OrderManager:
 
     @staticmethod
     def send_product(input_file):
+        # hay q añadir q cheque que los formatos de order_id y email sean correctos
+        # (distinguir que el json contenga ["OrderID"] y ["ContactEmail"] de que el fomato de estos esté bien)
+        # usar la regex del diagrama
+        try:
+            with open(input_file, "r", encoding="utf-8") as order_shipping_file:
+                order_shipping = json.load(order_shipping_file)
+            delivery_email = order_shipping["ContactEmail"]
+            order_id = order_shipping["OrderID"]
+            try:
+                # change input_file TODO
+                with open("../stores/order_requests.json", "r", encoding="utf-8") as order_request_file:
+                    order_request = json.load(order_request_file)
+                # We assume the order_id in the order_requests.json file always corresponds to the data
+                # provided, ensuring that this is true is the job of the register_order funtion TODO
+                if order_request["order_id"] == order_id:
+                    product_id = order_request["product_id"]
+                    order_type = order_request["order_type"]
+                else:
+                    raise OrderManagementException("OrderID not found in order request")
+            except:
+                raise OrderManagementException("Reading Order Request file failed")
+            shipping = OrderShipping(product_id, order_id, delivery_email, order_type)
+            return shipping.order_id
 
-        with open(input_file, "r", encoding="utf-8") as order_shipping_file:
-            order_shipping = json.load(order_shipping_file)
+        except json.JSONDecodeError as ex:
+            raise OrderManagementException("File provided not valid format") from ex
 
-
-        delivery_email = order_shipping["ContactEmail"]
-        order_id = order_shipping["OrderID"]
-
-        # change input_file TODO
-        with open("../stores/order_requests.json", "r", encoding="utf-8") as order_request_file:
-            order_request = json.load(order_request_file)
-
-        # We assume the order_id in the order_requests.json file always corresponds to the data
-        # provided, ensuring that this is true is the job of the registe_order funtion TODO
-        if order_request["order_id"] == order_id:
-            product_id = order_request["product_id"]
-            order_type = order_request["order_type"]
-        else:
-            raise OrderManagementException("File provided not correct")
-
-        shiping = OrderShipping(product_id, order_id, delivery_email, order_type)
-
-        return shiping.order_id
+#        except:
+#            with open(input_file, "r", encoding="utf-8") as order_shipping_file:
+#                order_shipping = order_shipping_file.read()
+#                pattern = r'\s{\s"OrderID"\s:\s"^[0-9]{13}",\s"ContactEmail"\s:\s"[\w]{1}[\w.]*@[a-z0-9]+\.[a-z]+"\s}\s'
+#                group = re.finditer(pattern, order_shipping)
+#                order_id = 0
+#                delivery_email = 0
 
