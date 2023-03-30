@@ -48,7 +48,7 @@ class OrderManager:
             mult = 1 if mult == 3 else 3
         return count % 10 == check
 
-    def register_order(self, product_id:str, order_type: str, address: str, phone_number: str, zip_code: str) -> str:
+    def register_order(self, product_id: str, order_type: str, address: str, phone_number: str, zip_code: str) -> str:
         # Check all attributes have the correct datatype
         if not isinstance(product_id, str) or not isinstance(order_type, str) or not isinstance(address, str) or \
                 not isinstance(phone_number, str) or not isinstance(zip_code, str):
@@ -161,7 +161,7 @@ class OrderManager:
         raise OrderManagementException("OrderID not found in order requests")
 
 
-    def deliver_product(self, tracking_code): #TODO actualizar codigo en la foto
+    def deliver_product(self, tracking_code: str) -> bool:
         if re.match(r'^[a-f0-9]{64}$', tracking_code) is None:
             raise OrderManagementException("Tracking code invalid format")
         try:
@@ -184,9 +184,9 @@ class OrderManager:
                                         }, separators=(',', ':'))
 
                 if hashlib.sha256(signature.encode()).hexdigest() != elem["tracking_code"]:
-                    raise OrderManagementException("Order registered is does not match tracking code")
+                    raise OrderManagementException("Order registered does not match tracking code")
                 if date.fromtimestamp(delivery_day) != date.fromtimestamp(datetime.timestamp(datetime.utcnow())):
-                    return False
+                    raise OrderManagementException("Delivery date not correct")
                 else:
                     delivery = OrderDelivery(tracking_code, delivery_day)
                     try:
@@ -200,40 +200,4 @@ class OrderManager:
                         raise OrderManagementException('Delivery file not found')
                     except json.JSONDecodeError:
                         raise OrderManagementException('Delivery file invalid format')
-        return False
-
-
-        #f = os.path.join(current_path, store_path, "order_requests.json")
-
-        #if shiping.
-
-        #try:
-        #    with open(f, "r", encoding="utf-8", newline=""):
-        #        data = json.load(f)
-        #except:
-
-        #return data
-
-
-
-#om = OrderManager()
-#
-#product_id = "8421691423220"
-#order_type = "REGULAR"
-#delivery_address = "C/LISBOA,4, MADRID, SPAIN"
-#phone_number = "123456789"
-#zip_code = "28005"
-#
-## run the function
-#order_id = om.register_order(product_id, order_type, delivery_address, phone_number, zip_code)
-#tracking_code = om.send_product('../stores/order_shipping.json')
-#
-#print(order_id, tracking_code)
-#
-
-
-#om = OrderManager()
-
-#a = o#m.deliver_product("201b992c72aaed218a37b2ef392eb3ce58edef85553fada83e3666f05139949e")
-#print#(a)
-
+        raise OrderManagementException('Shipping not found')
