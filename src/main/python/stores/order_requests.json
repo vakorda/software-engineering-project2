@@ -7,14 +7,5 @@
     "phone_number": "123456789",
     "zip_code": "28005",
     "time_stamp": 1679011200.0
-  },
-  {
-    "order_id": "93ad8ecd0fc177ae373e3bbd3212b5c5",
-    "product_id": "8421691423220",
-    "order_type": "REGULAR",
-    "delivery_address": "C/LISBOA,4, MADRID, SPAIN",
-    "phone_number": "123456789",
-    "zip_code": "28005",
-    "time_stamp": 1679011200.0
   }
 ]

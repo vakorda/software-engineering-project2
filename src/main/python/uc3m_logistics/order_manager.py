@@ -1,6 +1,5 @@
 """Module """
 import json
-import os
 import re
 from datetime import datetime, date
 from .order_request import OrderRequest
@@ -8,6 +7,7 @@ from .order_management_exception import OrderManagementException
 from .order_shipping import OrderShipping
 from .order_delivery import OrderDelivery
 import os
+import hashlib
 
 class OrderManager:
     """Class for providing the methods for managing the orders"""
@@ -109,17 +109,16 @@ class OrderManager:
         except json.JSONDecodeError as ex:
             raise OrderManagementException("File provided not valid format") from ex
 
-        # TODO: check that ContactEmail and OrderID exist in the file
+        try:
+            delivery_email = order_shipping["ContactEmail"]
+            order_id = order_shipping["OrderID"]
+        except KeyError:
+            raise OrderManagementException("Input file incorrect format")
 
-        delivery_email = order_shipping["ContactEmail"]
-        order_id = order_shipping["OrderID"]
-
-        # Check product_id:
         if re.match(r'^[a-z0-9]{32}$', order_id) is None:
             raise OrderManagementException("Order id wrong format")
         if re.match(r'^[a-zA-Z0-9-_.]+@([a-zA-Z0-9-_]+\.)+[a-zA-Z0-9-_]{2,4}$', delivery_email) is None:
             raise OrderManagementException("Delivery email wrong format")
-
         try:
             with open(self.__order_request_json_store, "r", encoding="utf-8") as order_request_file:
                 order_request = json.load(order_request_file)
@@ -131,29 +130,39 @@ class OrderManager:
         i = 1
         for i in range(len(order_request)):
             if order_request[i]["order_id"] == order_id:
-                # We assume the product_id and order_type have correct formats
-                # since it is the job of the register order function to do so
-                # if there was a case when they were not we should see that in the tests of the function
                 product_id = order_request[i]["product_id"]
+                delivery_address = order_request[i]["delivery_address"]
                 order_type = order_request[i]["order_type"]
-                i = -1  # i becomes negative when the request is found
-                break
-        if i > -1:
-            raise OrderManagementException("OrderID not found in order requests")
-        shipping = OrderShipping(product_id, order_id, delivery_email, order_type)
+                phone_number = order_request[i]["phone_number"]
+                zip_code = order_request[i]["zip_code"]
+                time_stamp = str(order_request[i]["time_stamp"])
+                signature = ('{"_OrderRequest__product_id": "' + product_id +
+                                '", "_OrderRequest__delivery_address": "' + delivery_address +
+                                '", "_OrderRequest__order_type": "' + order_type +
+                                '", "_OrderRequest__phone_number": "' + phone_number +
+                                '", "_OrderRequest__zip_code": "' + zip_code +
+                                '", "_OrderRequest__time_stamp": ' + time_stamp + '}')
 
-        with open(self.__order_shipping_json_store, "r", encoding="utf-8") as f:
-            data = list(json.load(f))
+                if hashlib.md5(signature.encode()).hexdigest() != order_id:
+                    raise OrderManagementException("File does not correspond to order id")
 
-        data.append(shipping.to_json_dict())
+                shipping = OrderShipping(product_id, order_id, delivery_email, order_type)
 
-        with open(self.__order_shipping_json_store, "w", encoding="utf-8") as f:
-            json.dump(data, f, indent=2)
+                with open(self.__order_shipping_json_store, "r", encoding="utf-8") as f:
+                    data = list(json.load(f))
 
-        return shipping.tracking_code
+                data.append(shipping.to_json_dict())
+
+                with open(self.__order_shipping_json_store, "w", encoding="utf-8") as f:
+                    json.dump(data, f, indent=2)
+
+                return shipping.tracking_code
+
+        raise OrderManagementException("OrderID not found in order requests")
+
 
     def deliver_product(self, tracking_code): #TODO actualizar codigo en la foto
-        if re.match(r'^[a-z0-9]{64}$', tracking_code) is None:
+        if re.match(r'^[a-f0-9]{64}$', tracking_code) is None:
             raise OrderManagementException("Tracking code invalid format")
         try:
             with open(self.__order_shipping_json_store, "r", encoding="utf-8") as f:
@@ -166,6 +175,16 @@ class OrderManager:
         for elem in data:
             if tracking_code == elem["tracking_code"]:
                 delivery_day = elem["delivery_day"]
+
+                signature = json.dumps({"alg": elem["alg"],
+                                        "typ": elem["typ"],
+                                        "order_id": elem["order_id"],
+                                        "issued_at": elem["issued_at"],
+                                        "delivery_day": elem["delivery_day"]
+                                        }, separators=(',', ':'))
+
+                if hashlib.sha256(signature.encode()).hexdigest() != elem["tracking_code"]:
+                    raise OrderManagementException("Order registered is does not match tracking code")
                 if date.fromtimestamp(delivery_day) != date.fromtimestamp(datetime.timestamp(datetime.utcnow())):
                     return False
                 else:

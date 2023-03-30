@@ -66,7 +66,7 @@ class OrderShipping():
         self.__delivery_email = value
 
     @property
-    def tracking_code( self ):
+    def tracking_code(self):
         """Returns the sha256 signature of the date"""
         return hashlib.sha256(self.__signature_string().encode()).hexdigest()
 

@@ -167,7 +167,7 @@ class MyTestCase(TestCase):
         with open(self.__shipping_path, "w", encoding="utf-8") as f:
             f.write("[{\"alg\": \"SHA-256\","
                     "\"typ\": \"DS\","
-                    "\"tracking_code\": \"d1c866b1e6d8c1e9823c8bed8909dbbb2e96bc4a73e7687fa70c7ed7eee2d8cd\","
+                    "\"tracking_code\": \"d1c866b1e6d8c1e9823c8bed8909dbbb2e12345673e7687fa70c7ed7eee2d8cd\","
                     "\"order_id\": \"93ad8ecd0fc177ae376e3b4d3212b5c5\","
                     "\"issued_at\": 1679011200.0,"
                     "\"delivery_day\": 1679616000.0}]")
