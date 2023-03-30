@@ -14,25 +14,28 @@ class OrderShipping():
         self.__delivery_email = delivery_email
         justnow = datetime.utcnow()
         self.__issued_at = datetime.timestamp(justnow)
-        if order_type == "Regular":
+        if order_type.upper() == "REGULAR":
             delivery_days = 7
         else:
             delivery_days = 1
-
-        #timestamp is represneted in seconds.microseconds
-        #__delivery_day must be expressed in seconds to be added to the timestap
         self.__delivery_day = self.__issued_at + (delivery_days * 24 * 60 * 60)
 
-    def to_json(self):
-        return self.__signature_string()
+    def to_json_dict(self):
+        return {"alg": self.__alg,
+                "typ": self.__type,
+                "tracking_code": self.tracking_code,
+                "order_id": self.__order_id,
+                "issued_at": self.__issued_at,
+                "delivery_day": self.__delivery_day
+                }
 
     def __signature_string(self):  # TODO
         """Composes the string to be used for generating the key for the date"""
-        return json.dumps({"alg":self.__alg,
-                           "typ":self.__type,
-                           "order_id":self.__order_id,
-                           "issued_at":self.__issued_at,
-                           "delivery_day":self.__delivery_day
+        return json.dumps({"alg": self.__alg,
+                           "typ": self.__type,
+                           "order_id": self.__order_id,
+                           "issued_at": self.__issued_at,
+                           "delivery_day": self.__delivery_day
                            }, separators=(',', ':'))
 
     @property

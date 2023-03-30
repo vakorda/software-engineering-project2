@@ -3,7 +3,7 @@ import hashlib
 import json
 from datetime import datetime
 
-class OrderRequest:
+class OrderRequest():
     """Class representing one order for a product"""
     def __init__(self, product_id, order_type, delivery_address, phone_number, zip_code):
         self.__product_id = product_id
@@ -14,8 +14,9 @@ class OrderRequest:
         justnow = datetime.utcnow()
         self.__time_stamp = datetime.timestamp(justnow)
 
-    def to_json(self):
-        return json.dumps({
+    def to_json_dict(self):
+        """returns a dictionary with all the keys in the format wanted in the json file"""
+        return {
          "order_id": self.order_id,
          "product_id": self.__product_id,
          "order_type": self.__order_type,
@@ -23,7 +24,7 @@ class OrderRequest:
          "phone_number": self.__phone_number,
          "zip_code": self.__zip_code,
          "time_stamp": self.__time_stamp
-        }, indent=2)
+        }
 
     def __str__(self):
         return json.dumps(self.__dict__)

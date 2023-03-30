@@ -41,7 +41,7 @@ class MyTestCase(TestCase):
 
         # open the file and check the parameters
         with open(self.__file_path, "r", encoding="utf-8") as file:
-            order_requests = json.load(file)
+            order_requests = json.load(file)[-1]
             self.assertDictEqual({
                 "order_id": order_id,
                 "product_id": product_id,
@@ -69,7 +69,7 @@ class MyTestCase(TestCase):
 
         # open the file and check the parameters
         with open(self.__file_path, "r", encoding="utf-8") as file:
-            order_requests = json.load(file)
+            order_requests = json.load(file)[-1]
             self.assertDictEqual({
                 "order_id": order_id,
                 "product_id": product_id,
@@ -96,7 +96,7 @@ class MyTestCase(TestCase):
 
         # open the file and check the parameters
         with open(self.__file_path, "r", encoding="utf-8") as file:
-            order_requests = json.load(file)
+            order_requests = json.load(file)[-1]
             self.assertDictEqual({
                 "order_id": order_id,
                 "product_id": product_id,
@@ -123,7 +123,7 @@ class MyTestCase(TestCase):
 
         # open the file and check the parameters
         with open(self.__file_path, "r", encoding="utf-8") as file:
-            order_requests = json.load(file)
+            order_requests = json.load(file)[-1]
             self.assertDictEqual({
                 "order_id": order_id,
                 "product_id": product_id,
@@ -150,7 +150,7 @@ class MyTestCase(TestCase):
 
         # open the file and check the parameters
         with open(self.__file_path, "r", encoding="utf-8") as file:
-            order_requests = json.load(file)
+            order_requests = json.load(file)[-1]
             self.assertDictEqual({
                 "order_id": order_id,
                 "product_id": product_id,
@@ -177,7 +177,7 @@ class MyTestCase(TestCase):
 
         # open the file and check the parameters
         with open(self.__file_path, "r", encoding="utf-8") as file:
-            order_requests = json.load(file)
+            order_requests = json.load(file)[-1]
             self.assertDictEqual({
                 "order_id": order_id,
                 "product_id": product_id,
@@ -204,7 +204,7 @@ class MyTestCase(TestCase):
 
         # open the file and check the parameters
         with open(self.__file_path, "r", encoding="utf-8") as file:
-            order_requests = json.load(file)
+            order_requests = json.load(file)[-1]
             self.assertDictEqual({
                 "order_id": order_id,
                 "product_id": product_id,
