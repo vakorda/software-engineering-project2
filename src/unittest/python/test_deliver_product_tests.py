@@ -125,7 +125,7 @@ class MyTestCase(TestCase):
 
     @freeze_time("2023-03-24")
     def test_05(self):
-        """1-3-4-7-16-E
+        """1-3-4-7-18-E
         Loop executed 0 times since shippings file is empty
         """
         # Initializes the requests file with the ones that lead to the corresponding order_id
@@ -148,7 +148,7 @@ class MyTestCase(TestCase):
 
     @freeze_time("2023-03-24")
     def test_06(self):
-        """1-3-4-7-16-E
+        """1-3-4-7-18-E
         Loop executed 1 time since tracking code not in shippings file
         """
         # Initializes the requests file with the ones that lead to the corresponding order_id
@@ -280,7 +280,7 @@ class MyTestCase(TestCase):
         self.assertEqual("Delivery file not found", str(ome.exception))
 
     @freeze_time("2023-03-24")
-    def test_10(self):
+    def test_11(self):
         """1-3-4-7-8-9-11-13-14-17-E
         Delivery file has invalid format
         """

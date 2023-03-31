@@ -1,5 +1,6 @@
 import pandas as pd
 
+
 # sheet_name = 1 significa que coge los datos de la segunda hoja
 df = pd.read_excel('G89.2023.T15.EG3.xlsx', sheet_name=1)
 
@@ -22,17 +23,18 @@ def create_tests():
     plantilla_1 = [
                     '    @freeze_time("2023-03-17")\n'
                     '    def test','(self):\n'
+                    '    # This test ends with no exceptions\n'
                     '        test_name = "test','.json"\n'
                     '        test_path = os.path.join(self.__test_folder, test_name)\n'
                     '\n'
-                    '        with open(self.__shipping_path, "r", encoding="utf-8") as f:\n'
-                    '            initial_shipings = json.load(f)\n'
+                    '        with open(self.__shipping_path, "r", encoding="utf-8") as file:\n'
+                    '            initial_shipings = json.load(file)\n'
                     '\n'
                     '        tracking_code = self.__order_manager.send_product(test_path)\n'
                     '        self.assertEqual("d1c866b1e6d8c1e9823c8bed8909dbbb2e96bc4a73e7687fa70c7ed7eee2d8cd", tracking_code)\n'
                     '\n'
-                    '        with open(self.__shipping_path, "r", encoding="utf-8") as f:\n'
-                    '            final_shipings = json.load(f)\n'
+                    '        with open(self.__shipping_path, "r", encoding="utf-8") as file:\n'
+                    '            final_shipings = json.load(file)\n'
                     '\n'
                     '        self.assertNotEqual(initial_shipings, final_shipings)\n'
                     '\n'
@@ -49,72 +51,76 @@ def create_tests():
     plantilla_2 = [
                     '   @freeze_time("2023-03-17")\n'
                     '   def test', '(self):\n'
+                    '    # This raises File provided not valid format\n'
                     '        test_name = "test', '.json"\n'
                     '        test_path = os.path.join(self.__test_folder, test_name)\n'
                     '\n'
-                    '        with open(self.__shipping_path, "r", encoding="utf-8") as f:\n'
-                    '            initial_shipings = list(json.load(f))\n'
+                    '        with open(self.__shipping_path, "r", encoding="utf-8") as file:\n'
+                    '            initial_shipings = list(json.load(file))\n'
                     '\n'
                     '        with self.assertRaises(OrderManagementException) as ome:\n'
                     '            self.__order_manager.send_product(test_path)\n'
                     '        self.assertEqual("File provided not valid format", str(ome.exception))\n'
                     '\n'
-                    '        with open(self.__shipping_path, "r", encoding="utf-8") as f:\n'
-                    '            final_shipings = list(json.load(f))\n'
+                    '        with open(self.__shipping_path, "r", encoding="utf-8") as file:\n'
+                    '            final_shipings = list(json.load(file))\n'
                     '\n'
                     '        self.assertListEqual(initial_shipings, final_shipings)\n']
 
     plantilla_3 = [
         '   @freeze_time("2023-03-17")\n'
         '   def test', '(self):\n'
+        '    # This raises Input file incorrect format format\n'
         '        test_name = "test', '.json"\n'
         '        test_path = os.path.join(self.__test_folder, test_name)\n'
         '\n'
-        '        with open(self.__shipping_path, "r", encoding="utf-8") as f:\n'
-        '            initial_shipings = list(json.load(f))\n'
+        '        with open(self.__shipping_path, "r", encoding="utf-8") as file:\n'
+        '            initial_shipings = list(json.load(file))\n'
         '\n'
         '        with self.assertRaises(OrderManagementException) as ome:\n'
         '            self.__order_manager.send_product(test_path)\n'
         '        self.assertEqual("Input file incorrect format", str(ome.exception))\n'
         '\n'
-        '        with open(self.__shipping_path, "r", encoding="utf-8") as f:\n'
-        '            final_shipings = list(json.load(f))\n'
+        '        with open(self.__shipping_path, "r", encoding="utf-8") as file:\n'
+        '            final_shipings = list(json.load(file))\n'
         '\n'
         '        self.assertListEqual(initial_shipings, final_shipings)\n']
 
     email_wrong_format = [
         '   @freeze_time("2023-03-17")\n'
         '   def test', '(self):\n'
+        '    # This raises Delivery email wrong format\n'
         '        test_name = "test', '.json"\n'
         '        test_path = os.path.join(self.__test_folder, test_name)\n'
         '\n'
-        '        with open(self.__shipping_path, "r", encoding="utf-8") as f:\n'
-        '            initial_shipings = list(json.load(f))\n'
+        '        with open(self.__shipping_path, "r", encoding="utf-8") as file:\n'
+        '            initial_shipings = list(json.load(file))\n'
         '\n'
         '        with self.assertRaises(OrderManagementException) as ome:\n'
         '            self.__order_manager.send_product(test_path)\n'
         '        self.assertEqual("Delivery email wrong format", str(ome.exception))\n'
         '\n'
-        '        with open(self.__shipping_path, "r", encoding="utf-8") as f:\n'
-        '            final_shipings = list(json.load(f))\n'
+        '        with open(self.__shipping_path, "r", encoding="utf-8") as file:\n'
+        '            final_shipings = list(json.load(file))\n'
         '\n'
         '        self.assertListEqual(initial_shipings, final_shipings)\n']
 
     order_id_wrong_format = [
         '   @freeze_time("2023-03-17")\n'
         '   def test', '(self):\n'
+        '    # This raises Order id wrong format\n'
         '        test_name = "test', '.json"\n'
         '        test_path = os.path.join(self.__test_folder, test_name)\n'
         '\n'
-        '        with open(self.__shipping_path, "r", encoding="utf-8") as f:\n'
-        '            initial_shipings = list(json.load(f))\n'
+        '        with open(self.__shipping_path, "r", encoding="utf-8") as file:\n'
+        '            initial_shipings = list(json.load(file))\n'
         '\n'
         '        with self.assertRaises(OrderManagementException) as ome:\n'
         '            self.__order_manager.send_product(test_path)\n'
         '        self.assertEqual("Order id wrong format", str(ome.exception))\n'
         '\n'
-        '        with open(self.__shipping_path, "r", encoding="utf-8") as f:\n'
-        '            final_shipings = list(json.load(f))\n'
+        '        with open(self.__shipping_path, "r", encoding="utf-8") as file:\n'
+        '            final_shipings = list(json.load(file))\n'
         '\n'
         '        self.assertListEqual(initial_shipings, final_shipings)\n']
 
@@ -137,30 +143,37 @@ def create_tests():
         for j in range(len(plantilla_1) - 1):
             out += str(i)
             out += plantilla_1[j + 1]
+        out += "\n"
+
+
 
     for i in tests_con_plantilla2:
         out += plantilla_2[0]
         for j in range(len(plantilla_2) - 1):
             out += str(i)
             out += plantilla_2[j + 1]
+        out += "\n"
 
     for i in tests_con_plantilla3:
         out += plantilla_2[0]
         for j in range(len(plantilla_3) - 1):
             out += str(i)
             out += plantilla_3[j + 1]
+        out += "\n"
 
     for i in tests_email_wrong_format:
         out += email_wrong_format[0]
         for j in range(len(email_wrong_format) - 1):
             out += str(i)
             out += email_wrong_format[j + 1]
+        out += "\n"
 
     for i in tests_order_id_wrong_format:
         out += order_id_wrong_format[0]
         for j in range(len(order_id_wrong_format) - 1):
             out += str(i)
             out += order_id_wrong_format[j + 1]
+        out += "\n"
 
     print(out)
 
