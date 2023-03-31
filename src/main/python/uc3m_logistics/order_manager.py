@@ -1,23 +1,27 @@
 """Module """
 import json
 import re
+import os
+import hashlib
 from datetime import datetime, date
 from .order_request import OrderRequest
 from .order_management_exception import OrderManagementException
 from .order_shipping import OrderShipping
 from .order_delivery import OrderDelivery
-import os
-import hashlib
+
 
 class OrderManager:
     """Class for providing the methods for managing the orders"""
-    def __init__(self):  # TODO
+    def __init__(self):
         store_path = "../stores/"
         current_path = os.path.dirname(__file__)
 
-        self.__order_request_json_store = os.path.join(current_path, store_path, "order_requests.json")
-        self.__order_shipping_json_store = os.path.join(current_path, store_path, "order_shipping.json")
-        self.__order_delivery_json_store = os.path.join(current_path, store_path, "order_delivery.json")
+        self.__order_request_json_store = os.path.join(current_path,
+                                                       store_path, "order_requests.json")
+        self.__order_shipping_json_store = os.path.join(current_path,
+                                                        store_path, "order_shipping.json")
+        self.__order_delivery_json_store = os.path.join(current_path,
+                                                        store_path, "order_delivery.json")
 
         """Create file if it does not exist and initialize it with an empty list"""
         try:
@@ -48,10 +52,16 @@ class OrderManager:
             mult = 1 if mult == 3 else 3
         return count % 10 == check
 
-    def register_order(self, product_id: str, order_type: str, address: str, phone_number: str, zip_code: str) -> str:
+    def register_order(self, product_id: str, order_type: str,
+                       address: str, phone_number: str, zip_code: str) -> str:
+        """
+        Verifies that the attributes are correct and registers the order
+        returns the order_id
+        """
         # Check all attributes have the correct datatype
-        if not isinstance(product_id, str) or not isinstance(order_type, str) or not isinstance(address, str) or \
-                not isinstance(phone_number, str) or not isinstance(zip_code, str):
+        if not isinstance(product_id, str) or not isinstance(order_type, str) or\
+                not isinstance(address, str) or not isinstance(phone_number, str) or\
+                not isinstance(zip_code, str):
             raise OrderManagementException("Attributes must be string datatype")
 
         # Check product_id:
@@ -87,7 +97,7 @@ class OrderManager:
         request = OrderRequest(product_id, order_type, address, phone_number, zip_code)
 
         # Create file:
-        try:  # TODO
+        try:
             with open(self.__order_request_json_store, "r", encoding="utf-8") as order_request_file:
                 data = json.load(order_request_file)
             data.append(request.to_json_dict())
@@ -95,12 +105,16 @@ class OrderManager:
                 json.dump(data, order_request_file, indent=2)
         except json.JSONDecodeError as ex:
             raise OrderManagementException("JSON Decode Error - Wrong JSON Format") from ex
-        except FileNotFoundError:
-            raise OrderManagementException("Output file does not exist")
+        except FileNotFoundError as ex:
+            raise OrderManagementException("Output file does not exist") from ex
 
         return request.order_id
 
     def send_product(self, input_file: str) -> str:
+        """
+        Receives the order to be delivered and adds it to shipments
+        returns the tracking code
+        """
         try:
             with open(input_file, "r", encoding="utf-8") as order_shipping_file:
                 order_shipping = json.load(order_shipping_file)
@@ -112,12 +126,14 @@ class OrderManager:
         try:
             delivery_email = order_shipping["ContactEmail"]
             order_id = order_shipping["OrderID"]
-        except KeyError:
-            raise OrderManagementException("Input file incorrect format")
+        except KeyError as ex:
+            raise OrderManagementException("Input file incorrect format") from ex
 
         if re.match(r'^[a-z0-9]{32}$', order_id) is None:
             raise OrderManagementException("Order id wrong format")
-        if re.match(r'^[a-zA-Z0-9-_.]+@([a-zA-Z0-9-_]+\.)+[a-zA-Z0-9-_]{2,4}$', delivery_email) is None:
+        if re.match(r'^[a-zA-Z0-9-_.]+@'
+                    r'([a-zA-Z0-9-_]+\.)+'
+                    r'[a-zA-Z0-9-_]{2,4}$', delivery_email) is None:
             raise OrderManagementException("Delivery email wrong format")
         try:
             with open(self.__order_request_json_store, "r", encoding="utf-8") as order_request_file:
@@ -127,7 +143,6 @@ class OrderManager:
         except json.JSONDecodeError as ex:
             raise OrderManagementException("Reading Order Request file failed") from ex
 
-        i = 1
         for i in range(len(order_request)):
             if order_request[i]["order_id"] == order_id:
                 product_id = order_request[i]["product_id"]
@@ -137,40 +152,44 @@ class OrderManager:
                 zip_code = order_request[i]["zip_code"]
                 time_stamp = str(order_request[i]["time_stamp"])
                 signature = ('{"_OrderRequest__product_id": "' + product_id +
-                                '", "_OrderRequest__delivery_address": "' + delivery_address +
-                                '", "_OrderRequest__order_type": "' + order_type +
-                                '", "_OrderRequest__phone_number": "' + phone_number +
-                                '", "_OrderRequest__zip_code": "' + zip_code +
-                                '", "_OrderRequest__time_stamp": ' + time_stamp + '}')
+                               '", "_OrderRequest__delivery_address": "' + delivery_address +
+                               '", "_OrderRequest__order_type": "' + order_type +
+                               '", "_OrderRequest__phone_number": "' + phone_number +
+                               '", "_OrderRequest__zip_code": "' + zip_code +
+                               '", "_OrderRequest__time_stamp": ' + time_stamp + '}')
 
                 if hashlib.md5(signature.encode()).hexdigest() != order_id:
                     raise OrderManagementException("File does not correspond to order id")
 
                 shipping = OrderShipping(product_id, order_id, delivery_email, order_type)
 
-                with open(self.__order_shipping_json_store, "r", encoding="utf-8") as f:
-                    data = list(json.load(f))
+                with open(self.__order_shipping_json_store, "r", encoding="utf-8") as file:
+                    data = list(json.load(file))
 
                 data.append(shipping.to_json_dict())
 
-                with open(self.__order_shipping_json_store, "w", encoding="utf-8") as f:
-                    json.dump(data, f, indent=2)
+                with open(self.__order_shipping_json_store, "w", encoding="utf-8") as file:
+                    json.dump(data, file, indent=2)
 
                 return shipping.tracking_code
 
         raise OrderManagementException("OrderID not found in order requests")
 
-
     def deliver_product(self, tracking_code: str) -> bool:
+        """
+        :param tracking_code: tracking code of a shipment
+        the function checks if package is delivered today
+        returns if it has been delivered
+        """
         if re.match(r'^[a-f0-9]{64}$', tracking_code) is None:
             raise OrderManagementException("Tracking code invalid format")
         try:
-            with open(self.__order_shipping_json_store, "r", encoding="utf-8") as f:
-                data = json.load(f)
-        except FileNotFoundError:
-            raise OrderManagementException('Shippings file not found')
-        except json.JSONDecodeError:
-            raise OrderManagementException('Shippings file invalid format')
+            with open(self.__order_shipping_json_store, "r", encoding="utf-8") as file:
+                data = json.load(file)
+        except FileNotFoundError as ex:
+            raise OrderManagementException('Shippings file not found') from ex
+        except json.JSONDecodeError as ex:
+            raise OrderManagementException('Shippings file invalid format') from ex
 
         for elem in data:
             if tracking_code == elem["tracking_code"]:
@@ -185,19 +204,20 @@ class OrderManager:
 
                 if hashlib.sha256(signature.encode()).hexdigest() != elem["tracking_code"]:
                     raise OrderManagementException("Order registered does not match tracking code")
-                if date.fromtimestamp(delivery_day) != date.fromtimestamp(datetime.timestamp(datetime.utcnow())):
+                if date.fromtimestamp(delivery_day) != \
+                        date.fromtimestamp(datetime.timestamp(datetime.utcnow())):
                     raise OrderManagementException("Delivery date not correct")
-                else:
-                    delivery = OrderDelivery(tracking_code, delivery_day)
-                    try:
-                        with open(self.__order_delivery_json_store, "r", encoding="utf-8") as f:
-                            data = json.load(f)
-                        data.append(delivery.to_json_dict())
-                        with open(self.__order_delivery_json_store, "w", encoding="utf-8") as f:
-                            json.dump(data, f, indent=2)
-                        return True
-                    except FileNotFoundError:
-                        raise OrderManagementException('Delivery file not found')
-                    except json.JSONDecodeError:
-                        raise OrderManagementException('Delivery file invalid format')
+
+                delivery = OrderDelivery(tracking_code, delivery_day)
+                try:
+                    with open(self.__order_delivery_json_store, "r", encoding="utf-8") as file:
+                        data = json.load(file)
+                    data.append(delivery.to_json_dict())
+                    with open(self.__order_delivery_json_store, "w", encoding="utf-8") as file:
+                        json.dump(data, file, indent=2)
+                    return True
+                except FileNotFoundError as ex:
+                    raise OrderManagementException('Delivery file not found') from ex
+                except json.JSONDecodeError as ex:
+                    raise OrderManagementException('Delivery file invalid format') from ex
         raise OrderManagementException('Shipping not found')

@@ -1,14 +1,14 @@
-"""class for testing the regsiter_order method"""
+"""class for testing the deliver_product method"""
 import os
 import json
 from unittest import TestCase
 import unittest
-from uc3m_logistics import OrderManager
+from uc3m_logistics import OrderManager, OrderManagementException
 from freezegun import freeze_time
-from uc3m_logistics import OrderManagementException
+
 
 class MyTestCase(TestCase):
-    """class for testing the register_order method"""
+    """class for testing the deliver_product method"""
 
     __file_path: str
 
@@ -18,10 +18,14 @@ class MyTestCase(TestCase):
         """Executed before all tests"""
         cls.__order_manager = OrderManager()
         current_path = os.path.dirname(__file__)
-        cls.__test_folder = os.path.join(current_path, "../../unittest/python/shippings")
-        cls.__requests_path = os.path.join(current_path, "../../main/python/stores/order_requests.json")
-        cls.__shipping_path = os.path.join(current_path, "../../main/python/stores/order_shipping.json")
-        cls.__deliver_path = os.path.join(current_path, "../../main/python/stores/order_delivery.json")
+        cls.__test_folder = os.path.join(current_path,
+                                         "../../unittest/python/shippings")
+        cls.__requests_path = os.path.join(current_path,
+                                           "../../main/python/stores/order_requests.json")
+        cls.__shipping_path = os.path.join(current_path,
+                                           "../../main/python/stores/order_shipping.json")
+        cls.__deliver_path = os.path.join(current_path,
+                                          "../../main/python/stores/order_delivery.json")
 
     def setUp(self) -> None:
         with open(self.__requests_path, "w", encoding="utf-8") as file:
@@ -45,13 +49,13 @@ class MyTestCase(TestCase):
             OrderManager().send_product(os.path.join(self.__test_folder, "test1.json"))
 
         tracking_code = "d1c866b1e6d8c1e9823c8bed8909dbbb2e96bc4a73e7687fa70c7ed7eee2d8cd"
-        with open(self.__deliver_path, "r", encoding="utf-8") as f:
-            initial_data = json.load(f)
+        with open(self.__deliver_path, "r", encoding="utf-8") as file:
+            initial_data = json.load(file)
         # run the function
         self.assertEqual(True, self.__order_manager.deliver_product(tracking_code))
         # Check that the contents of the file have changed
-        with open(self.__deliver_path, "r", encoding="utf-8") as f:
-            final_data = json.load(f)
+        with open(self.__deliver_path, "r", encoding="utf-8") as file:
+            final_data = json.load(file)
         self.assertNotEqual(initial_data, final_data)
 
         # open the file and check the parameters
@@ -74,15 +78,15 @@ class MyTestCase(TestCase):
             OrderManager().send_product(os.path.join(self.__test_folder, "test1.json"))
 
         tracking_code = "d1c866b1e6d8c1e9823c8bed8909dbbb2e96bc4a73e7687fa70c7ed7eee2d8cde"
-        with open(self.__deliver_path, "r", encoding="utf-8") as f:
-            initial_data = json.load(f)
+        with open(self.__deliver_path, "r", encoding="utf-8") as file:
+            initial_data = json.load(file)
         # run the function
         with self.assertRaises(OrderManagementException) as ome:
             self.__order_manager.deliver_product(tracking_code)
         self.assertEqual("Tracking code invalid format", str(ome.exception))
         # Check that the contents of the file are the same as before
-        with open(self.__deliver_path, "r", encoding="utf-8") as f:
-            final_data = json.load(f)
+        with open(self.__deliver_path, "r", encoding="utf-8") as file:
+            final_data = json.load(file)
         self.assertEqual(initial_data, final_data)
 
     @freeze_time("2023-03-24")
@@ -114,8 +118,8 @@ class MyTestCase(TestCase):
         with freeze_time("2023-03-17"):
             OrderManager().register_order(*arguments)
 
-        with open(self.__shipping_path, "w", encoding="utf-8") as f:
-            f.write("sfjhd]")
+        with open(self.__shipping_path, "w", encoding="utf-8") as file:
+            file.write("sfjhd]")
 
         tracking_code = "d1c866b1e6d8c1e9823c8bed8909dbbb2e96bc4a73e7687fa70c7ed7eee2d8cd"
         # run the function
@@ -135,15 +139,15 @@ class MyTestCase(TestCase):
             OrderManager().register_order(*arguments)
 
         tracking_code = "4485748578976883968438984357457459739579487598345738467897468967"
-        with open(self.__deliver_path, "r", encoding="utf-8") as f:
-            initial_data = json.load(f)
+        with open(self.__deliver_path, "r", encoding="utf-8") as file:
+            initial_data = json.load(file)
         # run the function
         with self.assertRaises(OrderManagementException) as ome:
             self.__order_manager.deliver_product(tracking_code)
         self.assertEqual("Shipping not found", str(ome.exception))
         # Check that the contents of the file have not changed
-        with open(self.__deliver_path, "r", encoding="utf-8") as f:
-            final_data = json.load(f)
+        with open(self.__deliver_path, "r", encoding="utf-8") as file:
+            final_data = json.load(file)
         self.assertEqual(initial_data, final_data)
 
     @freeze_time("2023-03-24")
@@ -159,15 +163,15 @@ class MyTestCase(TestCase):
             OrderManager().send_product(os.path.join(self.__test_folder, "test1.json"))
 
         tracking_code = "4485748578976883968438984357457459739579487598345738467897468967"
-        with open(self.__deliver_path, "r", encoding="utf-8") as f:
-            initial_data = json.load(f)
+        with open(self.__deliver_path, "r", encoding="utf-8") as file:
+            initial_data = json.load(file)
         # run the function
         with self.assertRaises(OrderManagementException) as ome:
             self.__order_manager.deliver_product(tracking_code)
         self.assertEqual("Shipping not found", str(ome.exception))
         # Check that the contents of the file have not changed
-        with open(self.__deliver_path, "r", encoding="utf-8") as f:
-            final_data = json.load(f)
+        with open(self.__deliver_path, "r", encoding="utf-8") as file:
+            final_data = json.load(file)
         self.assertEqual(initial_data, final_data)
 
     @freeze_time("2023-03-24")
@@ -176,13 +180,14 @@ class MyTestCase(TestCase):
         loop executed 2 times, second shipping is the one that we look for
         """
 
-        with open(self.__shipping_path, "w", encoding="utf-8") as f:
-            f.write("[{\"alg\": \"SHA-256\","
-                    "\"typ\": \"DS\","
-                    "\"tracking_code\": \"d1c866b1e6d8c1e9823c8bed8909dbbb2e12345673e7687fa70c7ed7eee2d8cd\","
-                    "\"order_id\": \"93ad8ecd0fc177ae376e3b4d3212b5c5\","
-                    "\"issued_at\": 1679011200.0,"
-                    "\"delivery_day\": 1679616000.0}]")
+        with open(self.__shipping_path, "w", encoding="utf-8") as file:
+            file.write("[{\"alg\": \"SHA-256\","
+                       "\"typ\": \"DS\","
+                       "\"tracking_code\": "
+                       "\"d1c866b1e6d8c1e9823c8bed8909dbbb2e12345673e7687fa70c7ed7eee2d8cd\","
+                       "\"order_id\": \"93ad8ecd0fc177ae376e3b4d3212b5c5\","
+                       "\"issued_at\": 1679011200.0,"
+                       "\"delivery_day\": 1679616000.0}]")
 
         # Initializes the requests file with the ones that lead to the corresponding order_id
         arguments = ["8421691423220", "REGULAR", "C/LISBOA,4, MADRID, SPAIN", "123456789", "28005"]
@@ -192,13 +197,13 @@ class MyTestCase(TestCase):
             OrderManager().send_product(os.path.join(self.__test_folder, "test1.json"))
 
         tracking_code = "d1c866b1e6d8c1e9823c8bed8909dbbb2e96bc4a73e7687fa70c7ed7eee2d8cd"
-        with open(self.__deliver_path, "r", encoding="utf-8") as f:
-            initial_data = json.load(f)
+        with open(self.__deliver_path, "r", encoding="utf-8") as file:
+            initial_data = json.load(file)
         # run the function
         self.assertEqual(True, self.__order_manager.deliver_product(tracking_code))
         # Check that the contents of the file have changed
-        with open(self.__deliver_path, "r", encoding="utf-8") as f:
-            final_data = json.load(f)
+        with open(self.__deliver_path, "r", encoding="utf-8") as file:
+            final_data = json.load(file)
         self.assertNotEqual(initial_data, final_data)
 
         # open the file and check the parameters
@@ -212,29 +217,29 @@ class MyTestCase(TestCase):
     @freeze_time("2023-03-17")
     def test_08(self):
         """1-3-4-7-8-9-10-E
-        The order in shipping order has the correct tracking_code but the arguments do not correspond to it
+        The order in shipping order has the correct tracking_code
+        but the arguments do not correspond to it
         """
-        # Initializes the requests file with the ones that lead to the corresponding order_id
-        arguments = ["8421691423220", "REGULAR", "C/LISBOA,4, MADRID, SPAIN", "123456789", "28005"]
         # write in the file the correct tracking code but other arguments changed
-        with open(self.__shipping_path, "w", encoding="utf-8") as f:
-            f.write("[{\"alg\": \"SHA-365\","
-                    "\"typ\": \"PA\","
-                    "\"tracking_code\": \"d1c866b1e6d8c1e9823c8bed8909dbbb2e12345673e7687fa70c7ed7eee2d8cd\","
-                    "\"order_id\": \"93ad8ecd0fc177ae376e3b4d3212b5c5\","
-                    "\"issued_at\": 1679011200.0,"
-                    "\"delivery_day\": 1679616000.0}]")
+        with open(self.__shipping_path, "w", encoding="utf-8") as file:
+            file.write("[{\"alg\": \"SHA-365\","
+                       "\"typ\": \"PA\","
+                       "\"tracking_code\": "
+                       "\"d1c866b1e6d8c1e9823c8bed8909dbbb2e12345673e7687fa70c7ed7eee2d8cd\","
+                       "\"order_id\": \"93ad8ecd0fc177ae376e3b4d3212b5c5\","
+                       "\"issued_at\": 1679011200.0,"
+                       "\"delivery_day\": 1679616000.0}]")
 
         tracking_code = "d1c866b1e6d8c1e9823c8bed8909dbbb2e12345673e7687fa70c7ed7eee2d8cd"
-        with open(self.__deliver_path, "r", encoding="utf-8") as f:
-            initial_data = json.load(f)
+        with open(self.__deliver_path, "r", encoding="utf-8") as file:
+            initial_data = json.load(file)
         # run the function
         with self.assertRaises(OrderManagementException) as ome:
             self.__order_manager.deliver_product(tracking_code)
         self.assertEqual("Order registered does not match tracking code", str(ome.exception))
         # Check that the contents of the file have not changed
-        with open(self.__deliver_path, "r", encoding="utf-8") as f:
-            final_data = json.load(f)
+        with open(self.__deliver_path, "r", encoding="utf-8") as file:
+            final_data = json.load(file)
         self.assertEqual(initial_data, final_data)
 
     @freeze_time("2023-03-17")
@@ -249,15 +254,15 @@ class MyTestCase(TestCase):
             OrderManager().register_order(*arguments)
 
         tracking_code = "4485748578976883968438984357457459739579487598345738467897468967"
-        with open(self.__deliver_path, "r", encoding="utf-8") as f:
-            initial_data = json.load(f)
+        with open(self.__deliver_path, "r", encoding="utf-8") as file:
+            initial_data = json.load(file)
         # run the function
         with self.assertRaises(OrderManagementException) as ome:
             self.__order_manager.deliver_product(tracking_code)
         self.assertEqual("Shipping not found", str(ome.exception))
         # Check that the contents of the file have not changed
-        with open(self.__deliver_path, "r", encoding="utf-8") as f:
-            final_data = json.load(f)
+        with open(self.__deliver_path, "r", encoding="utf-8") as file:
+            final_data = json.load(file)
         self.assertEqual(initial_data, final_data)
     @freeze_time("2023-03-24")
     def test_10(self):
@@ -294,8 +299,8 @@ class MyTestCase(TestCase):
 
         tracking_code = "d1c866b1e6d8c1e9823c8bed8909dbbb2e96bc4a73e7687fa70c7ed7eee2d8cd"
 
-        with open(self.__deliver_path, "w", encoding="utf-8") as f:
-            f.write("hjkfd]")
+        with open(self.__deliver_path, "w", encoding="utf-8") as file:
+            file.write("hjkfd]")
 
         with self.assertRaises(OrderManagementException) as ome:
             self.__order_manager.deliver_product(tracking_code)

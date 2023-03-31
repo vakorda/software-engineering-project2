@@ -21,6 +21,7 @@ class OrderShipping():
         self.__delivery_day = self.__issued_at + (delivery_days * 24 * 60 * 60)
 
     def to_json_dict(self):
+        """returns a dictionary with the correct json format"""
         return {"alg": self.__alg,
                 "typ": self.__type,
                 "tracking_code": self.tracking_code,
@@ -29,7 +30,7 @@ class OrderShipping():
                 "delivery_day": self.__delivery_day
                 }
 
-    def __signature_string(self):  # TODO
+    def __signature_string(self):
         """Composes the string to be used for generating the key for the date"""
         return json.dumps({"alg": self.__alg,
                            "typ": self.__type,

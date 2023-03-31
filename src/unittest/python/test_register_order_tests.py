@@ -3,10 +3,9 @@ import os
 import json
 from unittest import TestCase
 import unittest
-from uc3m_logistics import OrderManager
 from freezegun import freeze_time
-from uc3m_logistics import OrderRequest
-from uc3m_logistics import OrderManagementException
+from uc3m_logistics import OrderRequest, OrderManagementException, OrderManager
+
 
 class MyTestCase(TestCase):
     """class for testing the register_order method"""
@@ -23,8 +22,8 @@ class MyTestCase(TestCase):
         """Executed before each test"""
         self.__order_manager = OrderManager()
         # Empty output file
-        with open(self.__file_path, "w", encoding="utf-8") as f:
-            f.write("[]")  # the .json file needs to have something, else it could raise a JSONDecodeError
+        with open(self.__file_path, "w", encoding="utf-8") as file:
+            file.write("[]")
 
     # FIRST WE DO ALL THE CORRECT TESTS
     @freeze_time("2023-03-17")
@@ -37,7 +36,11 @@ class MyTestCase(TestCase):
         zip_code = "28005"
 
         # run the function
-        order_id = self.__order_manager.register_order(product_id, order_type, delivery_address, phone_number, zip_code)
+        order_id = self.__order_manager.register_order(product_id,
+                                                       order_type,
+                                                       delivery_address,
+                                                       phone_number,
+                                                       zip_code)
 
         # open the file and check the parameters
         with open(self.__file_path, "r", encoding="utf-8") as file:
@@ -53,7 +56,12 @@ class MyTestCase(TestCase):
             }, order_requests)
 
         # check order_id
-        self.assertEqual("93ad8ecd0fc177ae373e3bbd3212b5c5", OrderRequest(product_id, order_type, delivery_address, phone_number, zip_code).order_id)
+        self.assertEqual("93ad8ecd0fc177ae373e3bbd3212b5c5",
+                         OrderRequest(product_id,
+                                      order_type,
+                                      delivery_address,
+                                      phone_number,
+                                      zip_code).order_id)
 
     @freeze_time("2023-03-17")
     def test_06(self):
@@ -65,8 +73,11 @@ class MyTestCase(TestCase):
         zip_code = "28005"
 
         # run the function
-        order_id = self.__order_manager.register_order(product_id, order_type, delivery_address, phone_number, zip_code)
-
+        order_id = self.__order_manager.register_order(product_id,
+                                                       order_type,
+                                                       delivery_address,
+                                                       phone_number,
+                                                       zip_code)
         # open the file and check the parameters
         with open(self.__file_path, "r", encoding="utf-8") as file:
             order_requests = json.load(file)[-1]
@@ -80,7 +91,12 @@ class MyTestCase(TestCase):
                 "time_stamp": 1679011200.0
             }, order_requests)
         # check order_id
-        self.assertEqual("bd0e6e2b623b130048b77c98689933aa", OrderRequest(product_id, order_type, delivery_address, phone_number, zip_code).order_id)
+        self.assertEqual("bd0e6e2b623b130048b77c98689933aa",
+                         OrderRequest(product_id,
+                                      order_type,
+                                      delivery_address,
+                                      phone_number,
+                                      zip_code).order_id)
 
     @freeze_time("2023-03-17")
     def test_08(self):
@@ -92,8 +108,11 @@ class MyTestCase(TestCase):
         zip_code = "28005"
 
         # run the function
-        order_id = self.__order_manager.register_order(product_id, order_type, delivery_address, phone_number, zip_code)
-
+        order_id = self.__order_manager.register_order(product_id,
+                                                       order_type,
+                                                       delivery_address,
+                                                       phone_number,
+                                                       zip_code)
         # open the file and check the parameters
         with open(self.__file_path, "r", encoding="utf-8") as file:
             order_requests = json.load(file)[-1]
@@ -107,7 +126,12 @@ class MyTestCase(TestCase):
                 "time_stamp": 1679011200.0
             }, order_requests)
         # check order_id
-        self.assertEqual("5849a0f1531650992b9ea9de80286720", OrderRequest(product_id, order_type, delivery_address, phone_number, zip_code).order_id)
+        self.assertEqual("5849a0f1531650992b9ea9de80286720",
+                         OrderRequest(product_id,
+                                      order_type,
+                                      delivery_address,
+                                      phone_number,
+                                      zip_code).order_id)
 
     @freeze_time("2023-03-17")
     def test_12(self):
@@ -119,8 +143,11 @@ class MyTestCase(TestCase):
         zip_code = "28005"
 
         # run the function
-        order_id = self.__order_manager.register_order(product_id, order_type, delivery_address, phone_number, zip_code)
-
+        order_id = self.__order_manager.register_order(product_id,
+                                                       order_type,
+                                                       delivery_address,
+                                                       phone_number,
+                                                       zip_code)
         # open the file and check the parameters
         with open(self.__file_path, "r", encoding="utf-8") as file:
             order_requests = json.load(file)[-1]
@@ -134,20 +161,30 @@ class MyTestCase(TestCase):
                 "time_stamp": 1679011200.0
             }, order_requests)
         # check order_id
-        self.assertEqual("8e589ebb30161f23d13af400303e46a2", OrderRequest(product_id, order_type, delivery_address, phone_number, zip_code).order_id)
+        self.assertEqual("8e589ebb30161f23d13af400303e46a2",
+                         OrderRequest(product_id,
+                                      order_type,
+                                      delivery_address,
+                                      phone_number,
+                                      zip_code).order_id)
 
     @freeze_time("2023-03-17")
     def test_13(self):
         """V-13-BV) (ALL VALID | address[upper bound] length=100"""
         product_id = "8421691423220"
         order_type = "PREMIUM"
-        delivery_address = "CJ/ LA SARGENTO PEPA, 2468, GARGANTILLA DEL LOZOYA Y PINILLA DE BUITRAGO, COMUNIDAD DE MADRID, SPAIN"
+        delivery_address = "CJ/ LA SARGENTO PEPA, 2468, " \
+                           "GARGANTILLA DEL LOZOYA Y PINILLA DE BUITRAGO, " \
+                           "COMUNIDAD DE MADRID, SPAIN"
         phone_number = "123456789"
         zip_code = "28005"
 
         # run the function
-        order_id = self.__order_manager.register_order(product_id, order_type, delivery_address, phone_number, zip_code)
-
+        order_id = self.__order_manager.register_order(product_id,
+                                                       order_type,
+                                                       delivery_address,
+                                                       phone_number,
+                                                       zip_code)
         # open the file and check the parameters
         with open(self.__file_path, "r", encoding="utf-8") as file:
             order_requests = json.load(file)[-1]
@@ -161,7 +198,12 @@ class MyTestCase(TestCase):
                 "time_stamp": 1679011200.0
             }, order_requests)
         # check order_id
-        self.assertEqual("96be4e6047c4cd506faf7f6c0c02b527", OrderRequest(product_id, order_type, delivery_address, phone_number, zip_code).order_id)
+        self.assertEqual("96be4e6047c4cd506faf7f6c0c02b527",
+                         OrderRequest(product_id,
+                                      order_type,
+                                      delivery_address,
+                                      phone_number,
+                                      zip_code).order_id)
 
     @freeze_time("17-03-2023")
     def test_24(self):
@@ -173,8 +215,11 @@ class MyTestCase(TestCase):
         zip_code = "52999"
 
         # run the function
-        order_id = self.__order_manager.register_order(product_id, order_type, delivery_address, phone_number, zip_code)
-
+        order_id = self.__order_manager.register_order(product_id,
+                                                       order_type,
+                                                       delivery_address,
+                                                       phone_number,
+                                                       zip_code)
         # open the file and check the parameters
         with open(self.__file_path, "r", encoding="utf-8") as file:
             order_requests = json.load(file)[-1]
@@ -188,7 +233,12 @@ class MyTestCase(TestCase):
                 "time_stamp": 1679011200.0
             }, order_requests)
         # check order_id
-        self.assertEqual("3a1557c18bc194cd906fd6762cfd04f8", OrderRequest(product_id, order_type, delivery_address, phone_number, zip_code).order_id)
+        self.assertEqual("3a1557c18bc194cd906fd6762cfd04f8",
+                         OrderRequest(product_id,
+                                      order_type,
+                                      delivery_address,
+                                      phone_number,
+                                      zip_code).order_id)
 
     @freeze_time("17-03-2023")
     def test_25(self):
@@ -200,8 +250,11 @@ class MyTestCase(TestCase):
         zip_code = "01000"
 
         # run the function
-        order_id = self.__order_manager.register_order(product_id, order_type, delivery_address, phone_number, zip_code)
-
+        order_id = self.__order_manager.register_order(product_id,
+                                                       order_type,
+                                                       delivery_address,
+                                                       phone_number,
+                                                       zip_code)
         # open the file and check the parameters
         with open(self.__file_path, "r", encoding="utf-8") as file:
             order_requests = json.load(file)[-1]
@@ -215,7 +268,12 @@ class MyTestCase(TestCase):
                 "time_stamp": 1679011200.0
             }, order_requests)
         # check order_id
-        self.assertEqual("97f100660b53883f0a002cc6e50941c0", OrderRequest(product_id, order_type, delivery_address, phone_number, zip_code).order_id)
+        self.assertEqual("97f100660b53883f0a002cc6e50941c0",
+                         OrderRequest(product_id,
+                                      order_type,
+                                      delivery_address,
+                                      phone_number,
+                                      zip_code).order_id)
 
     @freeze_time("17-03-2023")
     def test_02(self):
@@ -228,7 +286,11 @@ class MyTestCase(TestCase):
 
         # run the function
         with self.assertRaises(OrderManagementException) as ome:
-            self.__order_manager.register_order(product_id, order_type, delivery_address, phone_number, zip_code)
+            self.__order_manager.register_order(product_id,
+                                                order_type,
+                                                delivery_address,
+                                                phone_number,
+                                                zip_code)
         self.assertEqual("Product id wrong format", str(ome.exception))
 
     @freeze_time("17-03-2023")
@@ -242,7 +304,11 @@ class MyTestCase(TestCase):
 
         # run the function
         with self.assertRaises(OrderManagementException) as ome:
-            self.__order_manager.register_order(product_id, order_type, delivery_address, phone_number, zip_code)
+            self.__order_manager.register_order(product_id,
+                                                order_type,
+                                                delivery_address,
+                                                phone_number,
+                                                zip_code)
         self.assertEqual("Product id not valid", str(ome.exception))
 
     @freeze_time("17-03-2023")
@@ -256,7 +322,11 @@ class MyTestCase(TestCase):
 
         # run the function
         with self.assertRaises(OrderManagementException) as ome:
-            self.__order_manager.register_order(product_id, order_type, delivery_address, phone_number, zip_code)
+            self.__order_manager.register_order(product_id,
+                                                order_type,
+                                                delivery_address,
+                                                phone_number,
+                                                zip_code)
         self.assertEqual("Product id not valid", str(ome.exception))
 
     @freeze_time("17-03-2023")
@@ -270,7 +340,11 @@ class MyTestCase(TestCase):
 
         # run the function
         with self.assertRaises(OrderManagementException) as ome:
-            self.__order_manager.register_order(product_id, order_type, delivery_address, phone_number, zip_code)
+            self.__order_manager.register_order(product_id,
+                                                order_type,
+                                                delivery_address,
+                                                phone_number,
+                                                zip_code)
         self.assertEqual("Product id not valid", str(ome.exception))
 
     @freeze_time("17-03-2023")
@@ -284,7 +358,10 @@ class MyTestCase(TestCase):
 
         # run the function
         with self.assertRaises(OrderManagementException) as ome:
-            self.__order_manager.register_order(product_id, order_type, delivery_address, phone_number, zip_code)
+            self.__order_manager.register_order(product_id, order_type,
+                                                delivery_address,
+                                                phone_number,
+                                                zip_code)
         self.assertEqual("Order type not valid", str(ome.exception))
 
     @freeze_time("17-03-2023")
@@ -298,7 +375,11 @@ class MyTestCase(TestCase):
 
         # run the function
         with self.assertRaises(OrderManagementException) as ome:
-            self.__order_manager.register_order(product_id, order_type, delivery_address, phone_number, zip_code)
+            self.__order_manager.register_order(product_id,
+                                                order_type,
+                                                delivery_address,
+                                                phone_number,
+                                                zip_code)
         self.assertEqual("Order type wrong format", str(ome.exception))
 
     @freeze_time("17-03-2023")
@@ -312,7 +393,11 @@ class MyTestCase(TestCase):
 
         # run the function
         with self.assertRaises(OrderManagementException) as ome:
-            self.__order_manager.register_order(product_id, order_type, delivery_address, phone_number, zip_code)
+            self.__order_manager.register_order(product_id,
+                                                order_type,
+                                                delivery_address,
+                                                phone_number,
+                                                zip_code)
         self.assertEqual("Address not valid", str(ome.exception))
 
     @freeze_time("17-03-2023")
@@ -326,7 +411,11 @@ class MyTestCase(TestCase):
 
         # run the function
         with self.assertRaises(OrderManagementException) as ome:
-            self.__order_manager.register_order(product_id, order_type, delivery_address, phone_number, zip_code)
+            self.__order_manager.register_order(product_id,
+                                                order_type,
+                                                delivery_address,
+                                                phone_number,
+                                                zip_code)
         self.assertEqual("Address not valid", str(ome.exception))
 
     @freeze_time("17-03-2023")
@@ -334,13 +423,19 @@ class MyTestCase(TestCase):
         """NV-14-BV)  (NOT VALID | address[longer] length=101"""
         product_id = "8421691423220"
         order_type = "PREMIUM"
-        delivery_address = "CJ/ LA SARGENTO PEPA, 24680, GARGANTILLA DEL LOZOYA Y PINILLA DE BUITRAGO, COMUNIDAD DE MADRID, SPAIN"
+        delivery_address = "CJ/ LA SARGENTO PEPA, 24680, " \
+                           "GARGANTILLA DEL LOZOYA Y PINILLA DE BUITRAGO, " \
+                           "COMUNIDAD DE MADRID, SPAIN"
         phone_number = "123456789"
         zip_code = "28005"
 
         # run the function
         with self.assertRaises(OrderManagementException) as ome:
-            self.__order_manager.register_order(product_id, order_type, delivery_address, phone_number, zip_code)
+            self.__order_manager.register_order(product_id,
+                                                order_type,
+                                                delivery_address,
+                                                phone_number,
+                                                zip_code)
         self.assertEqual("Address not valid", str(ome.exception))
 
     @freeze_time("17-03-2023")
@@ -354,7 +449,11 @@ class MyTestCase(TestCase):
 
         # run the function
         with self.assertRaises(OrderManagementException) as ome:
-            self.__order_manager.register_order(product_id, order_type, delivery_address, phone_number, zip_code)
+            self.__order_manager.register_order(product_id,
+                                                order_type,
+                                                delivery_address,
+                                                phone_number,
+                                                zip_code)
         self.assertEqual("Address not valid", str(ome.exception))
 
     @freeze_time("17-03-2023")
@@ -368,7 +467,11 @@ class MyTestCase(TestCase):
 
         # run the function
         with self.assertRaises(OrderManagementException) as ome:
-            self.__order_manager.register_order(product_id, order_type, delivery_address, phone_number, zip_code)
+            self.__order_manager.register_order(product_id,
+                                                order_type,
+                                                delivery_address,
+                                                phone_number,
+                                                zip_code)
         self.assertEqual("Phone number not valid", str(ome.exception))
 
     @freeze_time("17-03-2023")
@@ -382,7 +485,11 @@ class MyTestCase(TestCase):
 
         # run the function
         with self.assertRaises(OrderManagementException) as ome:
-            self.__order_manager.register_order(product_id, order_type, delivery_address, phone_number, zip_code)
+            self.__order_manager.register_order(product_id,
+                                                order_type,
+                                                delivery_address,
+                                                phone_number,
+                                                zip_code)
         self.assertEqual("Phone number not valid", str(ome.exception))
 
     @freeze_time("17-03-2023")
@@ -396,7 +503,11 @@ class MyTestCase(TestCase):
 
         # run the function
         with self.assertRaises(OrderManagementException) as ome:
-            self.__order_manager.register_order(product_id, order_type, delivery_address, phone_number, zip_code)
+            self.__order_manager.register_order(product_id,
+                                                order_type,
+                                                delivery_address,
+                                                phone_number,
+                                                zip_code)
         self.assertEqual("Phone number wrong format", str(ome.exception))
 
     @freeze_time("17-03-2023")
@@ -410,7 +521,11 @@ class MyTestCase(TestCase):
 
         # run the function
         with self.assertRaises(OrderManagementException) as ome:
-            self.__order_manager.register_order(product_id, order_type, delivery_address, phone_number, zip_code)
+            self.__order_manager.register_order(product_id,
+                                                order_type,
+                                                delivery_address,
+                                                phone_number,
+                                                zip_code)
         self.assertEqual("Phone number wrong format", str(ome.exception))
 
     @freeze_time("17-03-2023")
@@ -424,7 +539,11 @@ class MyTestCase(TestCase):
 
         # run the function
         with self.assertRaises(OrderManagementException) as ome:
-            self.__order_manager.register_order(product_id, order_type, delivery_address, phone_number, zip_code)
+            self.__order_manager.register_order(product_id,
+                                                order_type,
+                                                delivery_address,
+                                                phone_number,
+                                                zip_code)
         self.assertEqual("Zip code not valid", str(ome.exception))
 
     @freeze_time("17-03-2023")
@@ -438,7 +557,11 @@ class MyTestCase(TestCase):
 
         # run the function
         with self.assertRaises(OrderManagementException) as ome:
-            self.__order_manager.register_order(product_id, order_type, delivery_address, phone_number, zip_code)
+            self.__order_manager.register_order(product_id,
+                                                order_type,
+                                                delivery_address,
+                                                phone_number,
+                                                zip_code)
         self.assertEqual("Zip code not valid", str(ome.exception))
 
     @freeze_time("17-03-2023")
@@ -452,7 +575,11 @@ class MyTestCase(TestCase):
 
         # run the function
         with self.assertRaises(OrderManagementException) as ome:
-            self.__order_manager.register_order(product_id, order_type, delivery_address, phone_number, zip_code)
+            self.__order_manager.register_order(product_id,
+                                                order_type,
+                                                delivery_address,
+                                                phone_number,
+                                                zip_code)
         self.assertEqual("Zip code wrong format", str(ome.exception))
 
     @freeze_time("17-03-2023")
@@ -466,7 +593,11 @@ class MyTestCase(TestCase):
 
         # run the function
         with self.assertRaises(OrderManagementException) as ome:
-            self.__order_manager.register_order(product_id, order_type, delivery_address, phone_number, zip_code)
+            self.__order_manager.register_order(product_id,
+                                                order_type,
+                                                delivery_address,
+                                                phone_number,
+                                                zip_code)
         self.assertEqual("Zip code not valid", str(ome.exception))
 
     @freeze_time("17-03-2023")
@@ -480,7 +611,11 @@ class MyTestCase(TestCase):
 
         # run the function
         with self.assertRaises(OrderManagementException) as ome:
-            self.__order_manager.register_order(product_id, order_type, delivery_address, phone_number, zip_code)
+            self.__order_manager.register_order(product_id,
+                                                order_type,
+                                                delivery_address,
+                                                phone_number,
+                                                zip_code)
         self.assertEqual("Zip code not valid", str(ome.exception))
 
     @freeze_time("17-03-2023")
@@ -494,7 +629,11 @@ class MyTestCase(TestCase):
 
         # run the function
         with self.assertRaises(OrderManagementException) as ome:
-            self.__order_manager.register_order(product_id, order_type, delivery_address, phone_number, zip_code)
+            self.__order_manager.register_order(product_id,
+                                                order_type,
+                                                delivery_address,
+                                                phone_number,
+                                                zip_code)
         self.assertEqual("Zip code wrong format", str(ome.exception))
 
 
